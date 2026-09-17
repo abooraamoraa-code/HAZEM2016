@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة الإدارة الآمنة - إدارة المواقع والطلبات</title>
+    <style>
+        body { background: #030712; color: #f3f4f6; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; }
+        #lockScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; display: flex; justify-content: center; align-items: center; z-index: 999; }
+        .lock-box { background: #1e293b; padding: 35px; border-radius: 12px; width: 350px; text-align: center; border: 1px solid #334155; box-sizing: border-box; }
+        .lock-box input { width: 100%; padding: 12px; margin: 15px 0; background: #0f172a; border: 1px solid #475569; color: white; border-radius: 6px; text-align: center; font-size: 16px; box-sizing: border-box; }
+        .lock-box button { width: 100%; background: #ef4444; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        #adminContent { display: none; padding: 30px; max-width: 1200px; margin: 0 auto; box-sizing: border-box; }
+        h1 { color: #60a5fa; font-size: 22px; }
+        .panel-section { background: #1e293b; padding: 20px; border-radius: 10px; margin-bottom: 25px; border: 1px solid #334155; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: right; border-bottom: 1px solid #334155; font-size: 14px; }
+        th { color: #94a3b8; }
+        .btn { padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; border: none; }
+        .refresh-btn { background: #3b82f6; color: white; }
+        .add-btn { background: #10b981; color: white; width: 100%; margin-top: 10px; }
+        .del-btn { background: #ef4444; color: white; padding: 5px 10px; font-size: 12px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 13px; color: #94a3b8; }
+        input, textarea { width: 100%; padding: 10px; background: #0f172a; border: 1px solid #475569; color: white; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        textarea { height: 90px; resize: vertical; }
+    </style>
+</head>
+<body>
+
+    <div id="lockScreen">
+        <div class="lock-box">
+            <span style="background: #ef4444; color: white; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold;">منطقة محمية 🔒</span>
+            <h3 style="color: white; margin-top: 15px;">كلمة مرور المشرف</h3>
+            <input type="password" id="passInput" placeholder="كلمة المرور">
+            <button onclick="checkPass()">دخول اللوحة 🛡️</button>
+            <p id="errMsg" style="color: #f87171; font-size: 13px; margin-top: 10px;"></p>
+        </div>
+    </div>
+
+    <div id="adminContent">
+        <header style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 15px; margin-bottom: 25px;">
+            <h1>🛠️ لوحة تحكم المشرف (إدارة المتجر)</h1>
+            <div>
+                <a href="index.html" style="color: #60a5fa; text-decoration: none; margin-left: 15px; font-size: 14px;">العودة للمتجر 🏠</a>
+                <button class="btn refresh-btn" onclick="loadData()">تحديث البيانات 🔄</button>
+            </div>
+        </header>
+
+        <!-- قسم إضافة موقع جديد للمتجر -->
+        <div class="panel-section">
+            <h3 style="margin-top: 0; color: #34d399;">➕ إضافة قالب أو موقع جديد للمتجر</h3>
+            <div class="form-group">
+                <label>اسم الموقع أو القالب:</label>
+                <input type="text" id="newTitle" placeholder="مثال: موقع المحفظة الشخصية">
+            </div>
+            <div class="form-group">
+                <label>وصف مختصر للموقع:</label>
+                <input type="text" id="newDesc" placeholder="مثال: موقع تعريفي متجاوب لعرض المهارات والأعمال">
+            </div>
+            <div class="form-group">
+                <label>كود الـ HTML البرمجي للموقع (الذي سيتم تحميله):</label>
+                <textarea id="newCode" placeholder="&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;title&gt;موقعي&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;أهلاً بك&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;"></textarea>
+            </div>
+            <button class="btn add-btn" onclick="addNewTemplate()">إضافة الموقع ونشره في المتجر 🚀</button>
+        </div>
+
+        <!-- قسم إدارة وحذف المواقع الحالية -->
+        <div class="panel-section">
+            <h3 style="margin-top: 0; color: #f59e0b;">📂 المواقع والقوالب المضافة (إدارة وحذف)</h3>
+            <div id="templatesListDiv">جاري التحميل...</div>
+        </div>
+
+        <!-- قسم الطلبات المخصصة -->
+        <div class="panel-section">
+            <h3 style="margin-top: 0; color: #34d399;">📥 طلبات المواقع المخصصة من المستخدمين</h3>
+            <div id="ordersDiv">جاري التحميل...</div>
+        </div>
+
+        <!-- قسم سجل التحميلات -->
+        <div class="panel-section">
+            <h3 style="margin-top: 0; color: #60a5fa;">📊 سجل تحميلات القوالب</h3>
+            <div id="downloadsDiv">جاري التحميل...</div>
+        </div>
+    </div>
+
+    <script>
+        const SECURE_HASH = "YWRtaW4yMDI2"; // كلمة المرور: admin2026
+
+        function checkPass() {
+            const val = document.getElementById('passInput').value.trim();
+            if(btoa(val) === SECURE_HASH) {
+                document.getElementById('lockScreen').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+                loadData();
+            } else {
+                document.getElementById('errMsg').innerText = "كلمة المرور غير صحيحة!";
+                document.getElementById('passInput').value = "";
+            }
+        }
+
+        function addNewTemplate() {
+            const title = document.getElementById('newTitle').value.trim();
+            const desc = document.getElementById('newDesc').value.trim();
+            const code = document.getElementById('newCode').value.trim();
+
+            if (!title || !desc || !code) {
+                alert("يرجى تعبئة جميع حقول الموقع (الاسم، الوصف، والكود البرمجي)!");
+                return;
+            }
+
+            let customTemplates = JSON.parse(localStorage.getItem('app_custom_templates') || '[]');
+            customTemplates.push({ id: Date.now(), title: title, desc: desc, code: code });
+            localStorage.setItem('app_custom_templates', JSON.stringify(customTemplates));
+
+            alert("تم إضافة ونشر الموقع الجديد في المتجر بنجاح! 🚀");
+            document.getElementById('newTitle').value = "";
+            document.getElementById('newDesc').value = "";
+            document.getElementById('newCode').value = "";
+            loadData();
+        }
+
+        function deleteTemplate(id) {
+            if(!confirm("هل أنت متأكد من حذف هذا الموقع من المتجر؟")) return;
+            let customTemplates = JSON.parse(localStorage.getItem('app_custom_templates') || '[]');
+            customTemplates = customTemplates.filter(t => t.id !== id);
+            localStorage.setItem('app_custom_templates', JSON.stringify(customTemplates));
+            loadData();
+        }
+
+        function loadData() {
+            const customTemplates = JSON.parse(localStorage.getItem('app_custom_templates') || '[]');
+            const templatesDiv = document.getElementById('templatesListDiv');
+            
+            if(customTemplates.length === 0) {
+                templatesDiv.innerHTML = "<p style='color:#94a3b8;'>لا توجد مواقع مضافة حالياً (القوالب الـ 3 الأساسية ثابتة في المتجر).</p>";
+            } else {
+                let tHtml = "<table><tr><th>اسم القالب</th><th>الوصف</th><th>إجراء</th></tr>";
+                customTemplates.forEach(t => {
+                    tHtml += `<tr>
+                        <td style="color:#34d399; font-weight:bold;">${t.title}</td>
+                        <td>${t.desc}</td>
+                        <td><button class="btn del-btn" onclick="deleteTemplate(${t.id})">حذف 🗑️</button></td>
+                    </tr>`;
+                });
+                tHtml += "</table>";
+                templatesDiv.innerHTML = tHtml;
+            }
+
+            const orders = JSON.parse(localStorage.getItem('app_orders') || '[]');
+            const ordersDiv = document.getElementById('ordersDiv');
+            if(orders.length === 0) {
+                ordersDiv.innerHTML = "<p style='color:#94a3b8;'>لا توجد طلبات جديدة.</p>";
+            } else {
+                let html = "<table><tr><th>المستخدم</th><th>رابط الفيسبوك</th><th>المواصفات</th><th>الوقت</th></tr>";
+                orders.forEach(o => {
+                    html += `<tr><td style="color:#60a5fa;">${o.user}</td><td><a href="${o.fb}" target="_blank" style="color:#34d399;">فتح البروفايل 🔗</a></td><td>${o.details}</td><td>${o.time}</td></tr>`;
+                });
+                html += "</table>";
+                ordersDiv.innerHTML = html;
+            }
+
+            const downloads = JSON.parse(localStorage.getItem('app_downloads') || '[]');
+            const downloadsDiv = document.getElementById('downloadsDiv');
+            if(downloads.length === 0) {
+                downloadsDiv.innerHTML = "<p style='color:#94a3b8;'>لا توجد تحميلات مسجلة.</p>";
+            } else {
+                let html2 = "<table><tr><th>المستخدم</th><th>القالب المحمل</th><th>الوقت</th></tr>";
+                downloads.forEach(d => {
+                    html2 += `<tr><td>${d.user}</td><td>${d.item}</td><td>${d.time}</td></tr>`;
+                });
+                html2 += "</table>";
+                downloadsDiv.innerHTML = html2;
+            }
+        }
+    </script>
+</body>
+</html>
