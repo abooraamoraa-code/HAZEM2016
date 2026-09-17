@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر القوالب والمواقع الاحترافية</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f8fafc; color: #1e293b; margin: 0; padding: 0; }
+        .dev-badge { background: #0f172a; color: #f8fafc; text-align: center; padding: 8px; font-size: 13px; font-weight: bold; }
+        header { background: #ffffff; border-bottom: 1px solid #e2e8f0; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: bold; color: #2563eb; margin: 0; }
+        nav a { margin-left: 15px; text-decoration: none; color: #475569; font-weight: 500; font-size: 14px; }
+        nav a:hover { color: #2563eb; }
+        .hero { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; padding: 50px 20px; text-align: center; }
+        .hero h1 { font-size: 32px; margin-bottom: 10px; }
+        .hero p { color: #94a3b8; font-size: 15px; max-width: 600px; margin: 0 auto 20px auto; line-height: 1.6; }
+        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; box-sizing: border-box; }
+        .section-title { font-size: 22px; margin-bottom: 20px; border-right: 4px solid #2563eb; padding-right: 10px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .btn { background: #10b981; color: white; border: none; padding: 10px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        .btn:hover { background: #059669; }
+        .custom-order-box { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-top: 50px; border: 1px solid #cbd5e1; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
+        textarea { height: 120px; resize: vertical; }
+    </style>
+</head>
+<body>
+
+    <div class="dev-badge">📑 إدارة وتطوير أبو الحازم العمري</div>
+
+    <header>
+        <h2 class="logo">المتجر البرمجي المتقدم</h2>
+        <nav>
+            <a href="index.html">الرئيسية</a>
+            <a href="#store">المواقع الجاهزة</a>
+            <a href="#custom">اطلب صفحتك</a>
+            <a href="auth.html" id="authLink">حسابي / دخول</a>
+            <a href="admin.html" style="color: #ef4444; font-weight: bold;">لوحة الإدارة 🛠️</a>
+        </nav>
+    </header>
+
+    <div class="hero">
+        <h1>حمل مواقعك البرمجية غير المضغوطة مجاناً</h1>
+        <p>مواقع ويب جاهزة بملفات مباشرة وحقيقية قابلة للتعديل ببرنامج المفكرة.</p>
+    </div>
+
+    <div class="container" id="store">
+        <h2 class="section-title">المواقع الجاهزة للتحميل الفوري</h2>
+        <div class="grid" id="dynamicGrid">
+            <!-- سيتم تعبئة القوالب تلقائياً هنا -->
+        </div>
+
+        <div class="custom-order-box" id="custom">
+            <h2 class="section-title">اطلب صفحتك أو موقعك المخصص</h2>
+            <div class="form-group">
+                <label>رابط بروفايل فيسبوك للتسليم:</label>
+                <input type="text" id="fbLink" placeholder="https://facebook.com/your-profile">
+            </div>
+            <div class="form-group">
+                <label>تفاصيل ومواصفات الموقع المطلوبة:</label>
+                <textarea id="projectDetails" placeholder="اكتب كل تفاصيل موقعك والأقسام التي تريدها..."></textarea>
+            </div>
+            <button class="btn" style="background: #2563eb;" onclick="sendCustomOrder()">إرسال الطلب للنظام 🚀</button>
+        </div>
+    </div>
+
+    <script>
+        const userEmail = localStorage.getItem('user_email') || "زائر غير مسجل";
+        if (userEmail !== "زائر غير مسجل") {
+            document.getElementById('authLink').innerText = "حسابي (" + userEmail + ")";
+        }
+
+        const templateCode1 = "<!DOCTYPE html><html><head><title>قالب الشركات</title></head><body><h1>مرحبا بك في موقع الشركات</h1></body></html>";
+        const templateCode2 = "<!DOCTYPE html><html><head><title>لعبة جافاسكريبت</title></head><body><h1>منصة الألعاب</h1></body></html>";
+        const templateCode3 = "<!DOCTYPE html><html><head><title>لوحة التحكم</title></head><body><h1>لوحة تحكم النظام</h1></body></html>";
+
+        // تحميل وعرض القوالب (الأساسية + المضافة من لوحة التحكم)
+        window.addEventListener('DOMContentLoaded', () => {
+            const grid = document.getElementById('dynamicGrid');
+            
+            let content = `
+                <div class="card">
+                    <h3>قالب الشركات والخدمات</h3>
+                    <p>موقع متكامل للشركات والمشاريع مصمم بملفات نظيفة وقابلة للتعديل الفوري.</p>
+                    <button class="btn" onclick="downloadTemplate('قالب_الشركات', templateCode1)">تنزيل ملف الكود المباشر 📥</button>
+                </div>
+                <div class="card">
+                    <h3>منصة الألعاب المصغرة</h3>
+                    <p>لعبة ويب ممتعة مبنية بلغة جافاسكريبت البسيطة وجاهزة للتشغيل.</p>
+                    <button class="btn" onclick="downloadTemplate('منصة_الألعاب', templateCode2)">تنزيل ملف الكود المباشر 📥</button>
+                </div>
+                <div class="card">
+                    <h3>لوحة تحكم إدارية</h3>
+                    <p>واجهة تحكم بتصميم عصري وداكن جاهزة للاستخدام التفاعلي.</p>
+                    <button class="btn" onclick="downloadTemplate('لوحة_التحكم', templateCode3)">تنزيل ملف الكود المباشر 📥</button>
+                </div>
+            `;
+
+            const customTemplates = JSON.parse(localStorage.getItem('app_custom_templates') || '[]');
+            customTemplates.forEach(t => {
+                content += `
+                    <div class="card" style="border: 2px solid #2563eb;">
+                        <h3>${t.title}</h3>
+                        <p>${t.desc}</p>
+                        <button class="btn" onclick="downloadTemplate('${t.title}', \`${t.code.replace(/`/g, '\\`')}\`)">تنزيل ملف الكود المباشر 📥</button>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = content;
+        });
+
+        function downloadTemplate(fileName, codeContent) {
+            const blob = new Blob([codeContent], { type: 'text/html;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName + ".html";
+            link.click();
+
+            let downloads = JSON.parse(localStorage.getItem('app_downloads') || '[]');
+            downloads.push({ user: userEmail, item: fileName, time: new Date().toLocaleString() });
+            localStorage.setItem('app_downloads', JSON.stringify(downloads));
+
+            alert("تم تنزيل ملف (" + fileName + ".html) على جهازك بنجاح!");
+        }
+
+        function sendCustomOrder() {
+            const fb = document.getElementById('fbLink').value.trim();
+            const details = document.getElementById('projectDetails').value.trim();
+
+            if (!fb || !details) {
+                alert("يرجى ملء جميع الحقول!");
+                return;
+            }
+
+            let orders = JSON.parse(localStorage.getItem('app_orders') || '[]');
+            orders.push({ user: userEmail, fb: fb, details: details, time: new Date().toLocaleString() });
+            localStorage.setItem('app_orders', JSON.stringify(orders));
+
+            alert("تم حفظ طلبك بنجاح وسيتم متابعته والتسليم عبر فيسبوك!");
+            document.getElementById('fbLink').value = "";
+            document.getElementById('projectDetails').value = "";
+        }
+    </script>
+</body>
+</html>
